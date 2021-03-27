@@ -60,6 +60,7 @@ Mail: michalburdukiewicz@gmail.com
  - Wilkinson, L. (2005). The Grammar of Graphics (New York: Springer-Verlag).
  - Biecek, P. (2016). Zbiór esejów o sztuce prezentowania danych Odkrywać! Ujawniać! Objaśniać!” (Warszawa: Wydawnictwo Uniwersytetu Warszawskiego).
  - Cairo, A. (2019). How Charts Lie: Getting Smarter about Visual Information
+ - [Engebretsen M, Kennedy H. (2020). Data Visualization in Society](https://www.aup.nl/en/book/9789048543137/data-visualization-in-society)
  
 ## Plan spotkań
 
