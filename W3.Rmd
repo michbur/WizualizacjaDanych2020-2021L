@@ -1,0 +1,157 @@
+---
+title: "Wizualizacja danych II"
+author: "Michał Burdukiewicz"
+date: "29-05-2021"
+output: 
+  ioslides_presentation:
+    theme: "simplex"
+---
+
+<link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet">
+
+<style>
+slides > slide {
+  font-family: 'Montserrat', sans-serif;
+}
+
+.center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+
+}
+
+
+</style>
+
+
+```{r setup, include=FALSE}
+library(knitr)
+library(rgl)
+library(ggplot2)
+library(plotly)
+library(dplyr)
+library(patchwork)
+library(ggthemes)
+opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+knit_hooks$set(webgl = hook_webgl)
+data("midwest", package = "ggplot2")
+options(scipen=999)  # turn-off scientific notation like 1e+48
+theme_set(theme_bw())  # pre-set the bw theme.
+```
+
+## Przypomnienie
+
+Materiały: https://github.com/michbur/WizualizacjaDanych2020-2021L
+
+Riseup: https://pad.riseup.net/p/WWD-tmp
+
+Mail: michalburdukiewicz@gmail.com
+
+## Wybór wykresu
+
+ - https://www.data-to-viz.com/
+
+ - https://datavizcatalogue.com/
+
+# Zaawansowane wizualizacje danych
+
+## Mapa drzewa
+
+<a href="https://support.content.office.net/en-us/media/b3bfff05-380e-4dd9-b49b-7a2bfd128870.png"><img src="https://support.content.office.net/en-us/media/b3bfff05-380e-4dd9-b49b-7a2bfd128870.png" width="500px"></a>
+
+
+Źródło: MS Office.
+
+## Mapa drzewa
+
+Mapa drzewa (treemap): wizualizacja hierarchicznych danych za pomocą zagnieźdżonych obiektów.
+
+## Wykresy radarowe
+
+<a href="https://www.edrawsoft.com/chart/images/spider-chart-example-class.png"><img src="https://www.edrawsoft.com/chart/images/spider-chart-example-class.png" width="700px"></a>
+
+Źródło: edrawsoft.com
+
+## Wykresy radarowe
+
+Wykres radorowy (radar plot): porównanie kilku obiektów pod względem wielu charakterystyk.
+
+## Wykres trójkątny
+
+<a href="https://i.stack.imgur.com/r7fYI.png"><img src="https://i.stack.imgur.com/r7fYI.png" width="500px"></a>
+
+## Wykres trójkątny
+
+<img src="https://pbs.twimg.com/media/DM7ZVjtVoAA9cGK.jpg" width="450px" class="center">
+
+Źródło: https://fivethirtyeight.com/features/the-worst-tweeter-in-politics-isnt-trump/
+
+## Wykres trójkątny
+
+Wykres trójkątny (ternary plot): przedstawienie w dwóch wymiarach trzech zmiennych ciągłych.
+
+## Diagram Sankeya
+
+<a href="https://i.stack.imgur.com/zME0a.png"><img src="https://i.stack.imgur.com/zME0a.png" width="700px"></a>
+
+## Diagram Sankeya
+
+```{r}
+library(ggalluvial)
+
+ggplot(as.data.frame(Titanic),
+       aes(y = Freq,
+           axis1 = Survived, axis2 = Sex, axis3 = Class)) +
+  geom_alluvium(aes(fill = Class),
+                width = 0, knot.pos = 0, reverse = FALSE) +
+  guides(fill = FALSE) +
+  geom_stratum(width = 1/8, reverse = FALSE) +
+  geom_text(stat = "stratum", infer.label = TRUE, reverse = FALSE) +
+  scale_x_continuous(breaks = 1:3, labels = c("Survived", "Sex", "Class")) +
+  ggtitle("Titanic survival by class and sex") 
+  
+```
+
+## Diagram Sankeya
+
+Diagram Sankeya (alluvial plot): przestawienie przepływu obiektów między poszczególnymi stanami.
+
+## Wykres strunowy
+
+<a href="https://www.data-to-viz.com/graph/chord_files/figure-html/unnamed-chunk-1-1.png"><img src="https://www.data-to-viz.com/graph/chord_files/figure-html/unnamed-chunk-1-1.png" width="400px"></a>
+
+Źródło: https://www.data-to-viz.com/
+
+## Wykres strunowe
+
+```{r}
+library(circlize)
+set.seed(999)
+mat = matrix(sample(18, 18), 3, 6) 
+rownames(mat) = paste0("S", 1:3)
+colnames(mat) = paste0("E", 1:6)
+
+df = data.frame(from = rep(rownames(mat), times = ncol(mat)),
+    to = rep(colnames(mat), each = nrow(mat)),
+    value = as.vector(mat),
+    stringsAsFactors = FALSE)
+
+chordDiagram(mat)
+```
+
+## Wykres strunowy
+
+Wykres strunowy (chord diagram): przedstawienie zależności/przepływów między wieloma parami stanów.
+
+# Podsumowanie
+
+## Wizualizacje
+
+<img src="https://infobeautiful4.s3.amazonaws.com/2015/05/2552_What-Makes-a-Good-Infoviz-frame02.png" width="750px" class="center">
+
+Źródło: informationisbeautiful.net
+
+## Dobitne wizualizacje
+
+<iframe width="1166" height="656" src="https://www.youtube.com/embed/bRkXPuGAHkE" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
