@@ -1,0 +1,204 @@
+---
+title: "Przykłady i ich poprawione wersje"
+author: "Michał Burdukiewicz"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+library(dplyr)
+library(ggplot2)
+library(ggthemes)
+library(rayshader)
+library(ggbeeswarm)
+library(patchwork)
+theme_set(theme_bw())
+```
+
+```{r}
+set.seed(15390)
+dat <- droplevels(diamonds[sample(1L:nrow(diamonds), 100), ])
+```
+
+
+
+## Rysunek 1
+
+Cel: pokazanie zależności ceny od cięcia.
+
+Data: Zaagregować Fair i Good - koncepcja ??
+Atrybuty wizualne:
+Geometria:punktami w jednej lini rozchodzące się na boki - swarmplot - koncepcja ??
+Fasety:brak
+Statystyki: szerokość boxplot uzależniona od liczby obserwacji (grouped boxplot) z outlier'ami. - rekomendowany 
+Koordynanty:Układ kartezjański
+Motyw:poprawić estetykę.Dodać kolory rozróżniające typ cięcia.
+
+```{r, fig.height=8}
+
+p1 <- ggplot(dat, aes(x = cut, y = price)) +
+  geom_boxplot(outlier.color = NA) +
+  geom_point(position = "jitter") +
+  ggtitle("Przed zmianami")
+
+p2 <- ggplot(dat, aes(x = cut, color = cut, y = price)) +
+  geom_boxplot(varwidth = TRUE, outlier.color = NA) +
+  geom_quasirandom()+
+  ggtitle("Po zmianach")
+
+p1/p2
+```
+
+
+
+
+## Rysunek 2
+
+Cel: pokazanie liczby diamentów w zależności od cięcia i czystości.
+
+ Dane: Ilosc diamentow, z dwoma zmiennymi : "Cut" i "Clarity"
+Os(x) - Cut (poszczególne barcharty dla poszczególnych kaegorii cut)
+Os(y) - count ( barchart)
+Kształty - N/A
+Kolor- Clarity podobnie jak na rys 6 - odróżniające się kolory w jednej gamie im niższe clarity tym ciemniejsze.
+ 
+Geometria:  barchart. Ilość słupków jak ilość kategorii. W razie braku kategorii pusty słupek.
+ 
+Facety: N/A
+ 
+Statystyki: Liczebnosc na słupkach (można dać też wartość %)
+ 
+Koordynaty: Uklad kartezjański
+ 
+Motyw: 2D domyślny z siatka, kolororowy
+
+```{r, fig.height=8}
+p1 <- group_by(dat, cut, clarity) %>% 
+  summarise(count = length(price)) %>% 
+  ggplot(aes(x = cut, y = clarity, fill = count)) +
+  geom_tile(color = "black") +
+  scale_fill_gradient(low = "white", high = "black") +
+  ggtitle("Przed zmianami")
+
+p2 <- group_by(dat, cut, clarity) %>% 
+  summarise(count = length(price)) %>% 
+  ggplot(aes(x = cut, y = count, fill = clarity, label = count)) +
+  geom_col(position = position_dodge(width = 1)) +
+  geom_text(aes(y = count), position = position_dodge(width = 1), color = "black", vjust = -1) +
+  scale_y_continuous(expand = c(0.1, 0.2)) +
+  ggtitle("Po zmianach")
+
+p1/p2
+```
+
+
+
+
+
+## Rysunek 3
+
+Cel: pokazanie zależności ceny od liczby karatów i czystości.
+
+wykres punktowy
+
+Fasety: czystość
+
+```{r, fig.height=8}
+p1 <- ggplot(dat, aes(x = carat, y = price, shape = clarity)) +
+  geom_point() +
+  ggtitle("Przed zmianami")
+
+p2 <- ggplot(dat, aes(x = carat, y = price)) +
+  geom_point() +
+  facet_wrap(~ clarity) + 
+  ggtitle("Po zmianach")
+
+p1/p2
+```
+
+
+
+## Rysunek 4
+
+Cel: pokazać zależność ceny od liczby karatów.
+
+Motyw: scatter plot
+Koordynatory: układ kartezjański
+Statystyki: brak
+Fasety: brak,
+Geometrie: wykres 2D, widoczne 2 osie, widoczne linie siatki, punkty, 
+Atrybuty wizualne: wykres 2D, osie reprezentują price (oś y) i carat (oś x)
+
+```{r}
+p1 <- ggplot(dat, aes(x = carat, y = price)) +
+  stat_density2d(aes(fill = ..level..), geom = "polygon") +
+  ggtitle("Przed zmianami")
+
+plot_gg(p1, width = 3, height = 3)
+rgl::rglwidget()
+rgl::rgl.close()
+
+p2 <- ggplot(dat, aes(x = carat, y = price)) +
+  geom_point() +
+  ggtitle("Po zmianach")
+
+p2
+```
+
+
+
+
+
+
+## Rysunek 5
+
+Cel: pokazać liczbę diamentów w określonym kolorze, cięciu i czystości.
+
+Dane: diamenty w podziale na kolor/cięcie/czystość
+Atrybuty wizualne: oś x - clarity (podzielone na color), oś y - ilość w poszczególnych cut oznaczonych różnymi kolorami (interaktywnie widoczna ilość po najechaniu myszką)
+Geometrie: wykres słupkowy
+Fasety: brak 
+Statystyki: agregacja count/zliczanie
+Koordynaty: kartezjański
+Motyw: kolorowy     
+
+```{r,fig.height=11}
+p2 <- ggplot(dat, aes(x = color, fill = color)) +
+  geom_bar() +
+  facet_wrap( ~ clarity, labeller = label_both) +
+  ggtitle("Po zmianach")
+
+p1 <- ggplot(dat, aes(x = color)) +
+  geom_bar() +
+  facet_grid(cut ~ clarity, labeller = label_both) +
+  ggtitle("Przed zmianami")
+
+p1/p2
+```
+
+
+## Rysunek 6
+
+Cel: pokazać rozkład cen diamentów w zależności od cięcia.
+
+Ulepszenie wykresu: 
+    - fasety: dodanie fasetów (2-3)
+    - statystyki: zmniejszenie liczebności słupków histogramu albo wykres pudełkowy
+    - atrybuty wizualne: użycie odcieni jednego koloru – intensywność koloru powiązana z kategorią cut
+Zmiana wykresu:
+    - zrobić kilka wykresów z podziałem na kategorie "cut" i porównywać ceny w poszczególnych kategoriach cięcia
+
+```{r,fig.height=7}
+p1 <- ggplot(dat, aes(x = price, fill = cut)) +
+  geom_histogram() +
+  ggtitle("Przed zmianami")
+
+p2 <- ggplot(dat, aes(x = price, fill = cut)) +
+  geom_histogram() +
+  facet_wrap(~ cut) +
+  ggtitle("Po zmianach")
+
+p1/p2
+```
+
+
