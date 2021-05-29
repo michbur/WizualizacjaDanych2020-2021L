@@ -163,8 +163,8 @@ Koordynaty: kartezjański
 Motyw: kolorowy     
 
 ```{r,fig.height=11}
-p2 <- ggplot(dat, aes(x = color, fill = color)) +
-  geom_bar() +
+p2 <- ggplot(dat, aes(x = color, fill = cut)) +
+  geom_bar(position = "dodge") +
   facet_wrap( ~ clarity, labeller = label_both) +
   ggtitle("Po zmianach")
 
